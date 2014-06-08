@@ -21,8 +21,10 @@ package net.picklecraft.picklexpbank.Accounts;
 
 import java.util.ArrayList;
 import java.util.List;
+import net.picklecraft.picklexpbank.Factories.AccountFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -37,11 +39,16 @@ public class AccountManager {
     
     private final PickleXPBank plugin;
     
+    private static AccountManager instance;
+    
     private List<Account> accounts = new ArrayList<>();
     private List<XPSign> xpSigns = new ArrayList<>();
     
+    
+    
     public AccountManager(PickleXPBank plugin) {
         this.plugin = plugin;
+
         new BukkitRunnable() {
 
             @Override
@@ -49,6 +56,17 @@ public class AccountManager {
                 updateXPSigns();
             }
         }.runTaskTimer(plugin, 0, UPDATE_SIGN_RATE);
+        
+        instance = this;
+        
+    }
+    
+    public static AccountManager getInstance() {
+        if (instance == null) {
+            PickleXPBank plugin = (PickleXPBank)Bukkit.getPluginManager().getPlugin("PickleXPBank");
+            instance = new AccountManager(plugin);
+        }
+        return instance;
     }
     
     public PickleXPBank getPlugin() {
@@ -70,7 +88,7 @@ public class AccountManager {
             }
         }
         //no account existes, so lets make one.
-        Account account = new Account(player);
+        Account account = AccountFactory.createAccount(player);
         addAccount(account);
         return account;
     }

@@ -8,3 +8,6 @@ permissions:
          description: Allows player to place a xp sign.
      PickleXPBank.createBank:
          description: Allows player to create a bank.
+     PickleXPBank.placeOtherPlayerSign:
+         description: Allows admins to place other peoples signs.
+         default: op

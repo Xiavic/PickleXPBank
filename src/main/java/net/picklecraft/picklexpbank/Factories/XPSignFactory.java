@@ -17,37 +17,31 @@
  * MA 02110-1301  USA
  */
 
-package net.picklecraft.picklexpbank;
+package net.picklecraft.picklexpbank.Factories;
 
+import java.util.UUID;
 import net.picklecraft.picklexpbank.Accounts.Account;
+import net.picklecraft.picklexpbank.Accounts.AccountManager;
+import net.picklecraft.picklexpbank.XPSign;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 
 /**
  *
  * @author Pickle <curtisdhi@gmail.com>
  */
-public class XPSign {
-    private final Sign sign;
-    private final Account ownerAccount;
+public class XPSignFactory {
     
-    public XPSign(Sign sign, Account ownerAccount) {
-        this.sign = sign;
-        this.ownerAccount = ownerAccount;
+    
+    public static XPSign createXPSign(Sign sign, Account account) {
+        return new XPSign(sign, account);
     }
     
-    public Sign getSign() {
-        return sign;
+    public static XPSign createXPSign(Sign sign, UUID uuid) {
+        Player player = Bukkit.getServer().getPlayer(uuid);
+        Account account = AccountManager.getInstance().getAccount(player);
+        return createXPSign(sign, account);
     }
-    
-    public Account getAccount() {
-        return ownerAccount;     
-    }
-    
-    public void update() {
-        sign.setLine(2, ownerAccount.getPlayer().getName());
-        sign.setLine(4, String.valueOf(ownerAccount.getBalance()));
-        
-    }
-    
     
 }

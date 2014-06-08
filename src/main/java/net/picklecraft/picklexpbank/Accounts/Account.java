@@ -41,21 +41,46 @@ public class Account {
     public void setBalance(long balance) {
         this.balance = balance;
     }
+    
     public long getBalance() {
         return balance;
     }
     
     public void addBalance(long amount) {
         balance += amount;
-        player.setExp(player.getExp() - amount);
+        player.setTotalExperience(player.getTotalExperience() - (int)amount);
     }
     public void subBalance(long amount) {
         balance -= amount;
-        player.setExp(player.getExp() + amount);
+        player.setTotalExperience(player.getTotalExperience() + (int)amount);
     }
 
     public Player getPlayer() {
         return player;
     }
     
+    public boolean canPlaceXPSign() {
+        
+        if (player.hasPermission("PickleXPBank.placeSign")) {
+            
+            final AccountManager acManager = AccountManager.getInstance();
+            final int signLimit = acManager.getPlugin().getConfig().getInt("settings.signLimit");
+            
+            if (signLimit == 0 || acManager.countXPSigns(this) < signLimit ||
+                    player.hasPermission("PickleXPBank.placeOtherPlayerSign")) {
+                
+                return true;
+                
+            }
+            else {
+                player.sendMessage("I'm sorry, but you reached your limit.");
+            }
+            
+        }
+        else {
+            player.sendMessage("I'm sorry, but you lack permission.");        
+        }
+        
+        return false;
+    }
 }

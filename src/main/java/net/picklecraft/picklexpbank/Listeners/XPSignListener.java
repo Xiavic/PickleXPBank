@@ -20,6 +20,8 @@
 package net.picklecraft.picklexpbank.Listeners;
 
 import net.picklecraft.picklexpbank.Accounts.Account;
+import net.picklecraft.picklexpbank.Accounts.AccountManager;
+import net.picklecraft.picklexpbank.Factories.XPSignFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
 import org.bukkit.block.Sign;
@@ -45,36 +47,26 @@ public class XPSignListener implements Listener {
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onSignChangeEvent(SignChangeEvent event) {
-        String signCommand = plugin.getConfig().getString("settings.signCommand");
+        
+        final String signCommand = plugin.getConfig().getString("settings.signCommand");
         if (event.getLine(0).equalsIgnoreCase(signCommand)) {
             
-            if (event.getPlayer().hasPermission("PickleXPBank.placeSign")) {
-                final int signLimit = plugin.getConfig().getInt("settings.signLimit");
-                
-                Account account = plugin.getAccountManager().getAccount(event.getPlayer());
-                if (signLimit == 0 ||
-                        plugin.getAccountManager().countXPSigns(account) < signLimit) {
-                    
-                    XPSign xPSign = new XPSign((Sign)event.getBlock().getState(), account);
-                    plugin.getAccountManager().addXPSign(xPSign);
-                    
-                }
-                else {
-                    event.getPlayer().sendMessage("I'm sorry, but you reached your limit.");
-                    event.setCancelled(true);
-                }
-                
+            Account account = AccountManager.getInstance().getAccount(event.getPlayer());
+            
+            if (account.canPlaceXPSign()) {        
+                    XPSign xPSign = XPSignFactory.createXPSign((Sign)event.getBlock().getState(), account);
+                    AccountManager.getInstance().addXPSign(xPSign);
             }
             else {
-                event.getPlayer().sendMessage("I'm sorry, but you lack permission.");
                 event.setCancelled(true);
             }
+            
         }
         else {
             //Incase a plugin modifies the sign
-            XPSign xpSign = plugin.getAccountManager().getXPSign((Sign)event.getBlock().getState());
+            XPSign xpSign = AccountManager.getInstance().getXPSign((Sign)event.getBlock().getState());
             if (xpSign != null) {
-                plugin.getAccountManager().removeXPSign(xpSign);
+                AccountManager.getInstance().removeXPSign(xpSign);
             }
             
         }
@@ -83,19 +75,19 @@ public class XPSignListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (event.getClickedBlock().getState() instanceof Sign) {
-            XPSign xpSign = plugin.getAccountManager().getXPSign((Sign)event.getClickedBlock().getState());
+            XPSign xpSign = AccountManager.getInstance().getXPSign((Sign)event.getClickedBlock().getState());
             if (xpSign != null) {
                 
                 if (event.getPlayer() == xpSign.getAccount().getPlayer()) {
                     
                     //Left click removes from the balance and adds to the player.
                     if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                        long rate = plugin.getConfig().getLong("settings.removeRate");
+                        final long rate = plugin.getConfig().getLong("settings.removeRate");
                         xpSign.getAccount().subBalance(rate);
                     }
                     //Right click adds to the sign and removes from the player
                     else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                        long rate = plugin.getConfig().getLong("settings.addRate");
+                        final long rate = plugin.getConfig().getLong("settings.addRate");
                         xpSign.getAccount().addBalance(rate);
                     }
                     
@@ -112,10 +104,12 @@ public class XPSignListener implements Listener {
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if (event.getBlock().getState() instanceof Sign) {
             
-            XPSign xpSign = plugin.getAccountManager().getXPSign((Sign)event.getBlock().getState());
+            XPSign xpSign = AccountManager.getInstance().getXPSign((Sign)event.getBlock().getState());
             if (xpSign != null) {
                 if (event.getPlayer() == xpSign.getAccount().getPlayer()) {
-                    plugin.getAccountManager().removeXPSign(xpSign);
+                    
+                    AccountManager.getInstance().removeXPSign(xpSign);
+                    
                 }
                 else {
                     event.getPlayer().sendMessage("Hey! that's not yours!");
