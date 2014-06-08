@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank;
 
+import net.picklecraft.picklexpbank.Accounts.AccountManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -27,13 +28,20 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class PickleXPBank extends JavaPlugin {
     
+    private AccountManager accountManager;
+    
     @Override 
     public void onEnable() {
+        accountManager = new AccountManager(this);
         
     }
     @Override 
     public void onDisable() {
         
+    }
+    
+    public AccountManager getAccountManager() {
+        return accountManager;
     }
     
 }

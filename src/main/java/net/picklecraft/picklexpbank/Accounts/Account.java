@@ -17,7 +17,7 @@
  * MA 02110-1301  USA
  */
 
-package net.picklecraft.picklexpbank;
+package net.picklecraft.picklexpbank.Accounts;
 
 import org.bukkit.entity.Player;
 
@@ -47,9 +47,11 @@ public class Account {
     
     public void addBalance(long amount) {
         balance += amount;
+        player.setExp(player.getExp() - amount);
     }
-    public void subBalace(long amount) {
+    public void subBalance(long amount) {
         balance -= amount;
+        player.setExp(player.getExp() + amount);
     }
 
     public Player getPlayer() {

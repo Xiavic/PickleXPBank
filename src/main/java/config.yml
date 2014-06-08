@@ -1,2 +1,4 @@
 settings:
     signCommand: "~XPBank~"
+    removeRate: 10
+    addRate: 10

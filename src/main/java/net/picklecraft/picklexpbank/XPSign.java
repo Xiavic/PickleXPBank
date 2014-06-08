@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank;
 
+import net.picklecraft.picklexpbank.Accounts.Account;
 import org.bukkit.block.Sign;
 
 /**
@@ -41,5 +42,11 @@ public class XPSign {
     public Account getAccount() {
         return ownerAccount;     
     }
+    
+    public void update() {
+        sign.setLine(4, String.valueOf(ownerAccount.getBalance()));
+        
+    }
+    
     
 }
