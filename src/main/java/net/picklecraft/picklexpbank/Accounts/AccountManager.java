@@ -92,6 +92,18 @@ public class AccountManager {
         return null;
     }
     
+    public int countXPSigns(Account account) {
+        int count = 0;
+        
+        for (XPSign xpSign : xpSigns) {
+            if (xpSign.getAccount() == account) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+    
     public void updateXPSigns() {
         for (XPSign xpSign : xpSigns) {
             xpSign.update();

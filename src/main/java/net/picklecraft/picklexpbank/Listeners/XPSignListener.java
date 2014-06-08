@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank.Listeners;
 
+import net.picklecraft.picklexpbank.Accounts.Account;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
 import org.bukkit.block.Sign;
@@ -46,10 +47,23 @@ public class XPSignListener implements Listener {
     public void onSignChangeEvent(SignChangeEvent event) {
         String signCommand = plugin.getConfig().getString("settings.signCommand");
         if (event.getLine(0).equalsIgnoreCase(signCommand)) {
+            
             if (event.getPlayer().hasPermission("PickleXPBank.placeSign")) {
-                XPSign xPSign = new XPSign((Sign)event.getBlock().getState(), 
-                    plugin.getAccountManager().getAccount(event.getPlayer()));
-                plugin.getAccountManager().addXPSign(xPSign);
+                final int signLimit = plugin.getConfig().getInt("settings.signLimit");
+                
+                Account account = plugin.getAccountManager().getAccount(event.getPlayer());
+                if (signLimit == 0 ||
+                        plugin.getAccountManager().countXPSigns(account) < signLimit) {
+                    
+                    XPSign xPSign = new XPSign((Sign)event.getBlock().getState(), account);
+                    plugin.getAccountManager().addXPSign(xPSign);
+                    
+                }
+                else {
+                    event.getPlayer().sendMessage("I'm sorry, but you reached your limit.");
+                    event.setCancelled(true);
+                }
+                
             }
             else {
                 event.getPlayer().sendMessage("I'm sorry, but you lack permission.");
@@ -62,6 +76,7 @@ public class XPSignListener implements Listener {
             if (xpSign != null) {
                 plugin.getAccountManager().removeXPSign(xpSign);
             }
+            
         }
     }
     
