@@ -1,0 +1,10 @@
+name: PickleXPBank
+main: net.picklecraft.PickleXPBank
+author: Pickle,ImHandMade
+version: 0.1
+description: Allows players to store XP points, not levels, into signs.
+permissions:
+     PickleXPBank.placeSign:
+         description: Allows player to place a xp sign.
+     PickleXPBank.createBank:
+         description: Allows player to create a bank.
