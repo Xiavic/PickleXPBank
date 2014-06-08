@@ -48,7 +48,7 @@ public class AccountManager {
             public void run() {
                 updateXPSigns();
             }
-        }.runTaskTimer(plugin, 0, 20);
+        }.runTaskTimer(plugin, 0, UPDATE_SIGN_RATE);
     }
     
     public PickleXPBank getPlugin() {
