@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank.Accounts;
 
+import net.picklecraft.picklexpbank.PickleXPBank;
 import org.bukkit.entity.Player;
 
 /**
@@ -63,7 +64,7 @@ public class Account {
         
         if (player.hasPermission("PickleXPBank.placeSign")) {
             
-            final AccountManager acManager = AccountManager.getInstance();
+            final AccountManager acManager = PickleXPBank.getInstance().getAccountManager();
             final int signLimit = acManager.getPlugin().getConfig().getInt("settings.signLimit");
             
             if (signLimit == 0 || acManager.countXPSigns(this) < signLimit ||

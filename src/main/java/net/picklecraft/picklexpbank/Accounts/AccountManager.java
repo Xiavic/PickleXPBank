@@ -25,7 +25,6 @@ import java.util.TimerTask;
 import net.picklecraft.picklexpbank.Factories.AccountFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -40,13 +39,9 @@ public class AccountManager extends TimerTask {
     
     private final PickleXPBank plugin;
     
-    private static AccountManager instance;
-    
     private List<Account> accounts = new ArrayList<>();
     private List<XPSign> xpSigns = new ArrayList<>();
-    
-    
-    
+
     public AccountManager(PickleXPBank plugin) {
         this.plugin = plugin;
 
@@ -56,18 +51,8 @@ public class AccountManager extends TimerTask {
             public void run() {
                 updateXPSigns();
             }
-        }.runTaskTimer(plugin, 0, UPDATE_SIGN_RATE);
+        }.runTaskTimer(plugin, 0, UPDATE_SIGN_RATE);   
         
-        instance = this;
-        
-    }
-    
-    public static AccountManager getInstance() {
-        if (instance == null) {
-            PickleXPBank plugin = (PickleXPBank)Bukkit.getPluginManager().getPlugin("PickleXPBank");
-            instance = new AccountManager(plugin);
-        }
-        return instance;
     }
     
     public PickleXPBank getPlugin() {

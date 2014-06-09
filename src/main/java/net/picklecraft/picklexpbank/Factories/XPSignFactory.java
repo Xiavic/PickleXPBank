@@ -21,7 +21,7 @@ package net.picklecraft.picklexpbank.Factories;
 
 import java.util.UUID;
 import net.picklecraft.picklexpbank.Accounts.Account;
-import net.picklecraft.picklexpbank.Accounts.AccountManager;
+import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Sign;
@@ -40,7 +40,7 @@ public class XPSignFactory {
     
     public static XPSign createXPSign(Sign sign, UUID uuid) {
         Player player = Bukkit.getServer().getPlayer(uuid);
-        Account account = AccountManager.getInstance().getAccount(player);
+        Account account = PickleXPBank.getInstance().getAccountManager().getAccount(player);
         return createXPSign(sign, account);
     }
     

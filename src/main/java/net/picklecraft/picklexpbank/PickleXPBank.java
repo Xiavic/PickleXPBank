@@ -38,6 +38,7 @@ public class PickleXPBank extends JavaPlugin {
     private static PickleXPBank instance;
     
     private Consumer consumer;
+    private AccountManager accountManager;
     
     public static PickleXPBank getInstance() {
         if (instance == null) {
@@ -73,6 +74,7 @@ public class PickleXPBank extends JavaPlugin {
             getLogger().severe("Error while loading: " + ex.getMessage());
         }
         consumer = new Consumer(this);
+        accountManager = new AccountManager(this);
         
     }
     
@@ -81,7 +83,7 @@ public class PickleXPBank extends JavaPlugin {
         
         
         getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
-        getServer().getScheduler().runTaskTimer(this, AccountManager.getInstance(), 0, 20);
+        getServer().getScheduler().runTaskTimer(this, accountManager, 0, 20);
     }
     
     @Override 
@@ -113,6 +115,10 @@ public class PickleXPBank extends JavaPlugin {
     
     public Consumer getConsumer() {
         return consumer;
+    }
+    
+    public AccountManager getAccountManager() {
+        return accountManager;
     }
     
 }
