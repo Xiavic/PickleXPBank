@@ -30,6 +30,8 @@ public class XPSign {
     private final Sign sign;
     private final Account ownerAccount;
     
+    private boolean isRemoved;
+    
     public XPSign(Sign sign, Account ownerAccount) {
         this.sign = sign;
         this.ownerAccount = ownerAccount;
@@ -41,6 +43,14 @@ public class XPSign {
     
     public Account getAccount() {
         return ownerAccount;     
+    }
+    
+    public void setIsRemoved(boolean isRemoved) {
+        this.isRemoved = isRemoved;
+    }
+    
+    public boolean isRemoved() {
+        return isRemoved;
     }
     
     public void update() {

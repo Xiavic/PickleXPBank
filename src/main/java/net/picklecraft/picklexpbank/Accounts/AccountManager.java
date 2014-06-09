@@ -21,6 +21,7 @@ package net.picklecraft.picklexpbank.Accounts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimerTask;
 import net.picklecraft.picklexpbank.Factories.AccountFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
@@ -33,7 +34,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  *
  * @author Pickle <curtisdhi@gmail.com>
  */
-public class AccountManager {
+public class AccountManager extends TimerTask {
     
     private final long UPDATE_SIGN_RATE = 20; //1 second
     
@@ -74,6 +75,7 @@ public class AccountManager {
     }
     
     public void addAccount(Account account) {
+        plugin.getConsumer().queueAccount(account);
         accounts.add(account);
     }
          
@@ -94,10 +96,12 @@ public class AccountManager {
     }
     
     public void addXPSign(XPSign xpSign) {
+        plugin.getConsumer().queueXPSign(xpSign);
         xpSigns.add(xpSign);
     }
     
     public void removeXPSign(XPSign xpSign) {
+        plugin.getConsumer().queueXPSign(xpSign);
         xpSigns.remove(xpSign);
     }
     
@@ -120,6 +124,11 @@ public class AccountManager {
         }
         
         return count;
+    }
+    
+    @Override
+    public void run() {
+        updateXPSigns();
     }
     
     public void updateXPSigns() {

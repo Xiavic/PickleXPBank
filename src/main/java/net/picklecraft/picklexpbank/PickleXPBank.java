@@ -22,6 +22,8 @@ package net.picklecraft.picklexpbank;
 import java.sql.Connection;
 import java.util.logging.Level;
 import net.picklecraft.Util.MySQLConnectionPool;
+import net.picklecraft.picklexpbank.Accounts.AccountManager;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -33,8 +35,20 @@ public class PickleXPBank extends JavaPlugin {
     private MySQLConnectionPool sqlPool;
     private boolean connected;
     
-    @Override 
+    private static PickleXPBank instance;
+    
+    private Consumer consumer;
+    
+    public static PickleXPBank getInstance() {
+        if (instance == null) {
+            instance = (PickleXPBank)Bukkit.getPluginManager().getPlugin("PickleXPBank");
+        }
+        return instance;
+    }
+    
+    @Override
     public void onLoad() {
+        instance = this;
         
         final String host = getConfig().getString("settings.mysql.host");
         final String database = getConfig().getString("settings.mysql.database");
@@ -58,12 +72,16 @@ public class PickleXPBank extends JavaPlugin {
         catch (final Exception ex) {
             getLogger().severe("Error while loading: " + ex.getMessage());
         }
-  
+        consumer = new Consumer(this);
+        
     }
     
     @Override 
     public void onEnable() {
         
+        
+        getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
+        getServer().getScheduler().runTaskTimer(this, AccountManager.getInstance(), 0, 20);
     }
     
     @Override 
@@ -91,6 +109,10 @@ public class PickleXPBank extends JavaPlugin {
             }
             return null;
         }
+    }
+    
+    public Consumer getConsumer() {
+        return consumer;
     }
     
 }

@@ -36,6 +36,7 @@ import org.bukkit.Bukkit;
  */
 public class Consumer extends TimerTask {
     
+    private final long TIME_PER_RUN = 1000; 
     private final PickleXPBank plugin;
     
     private final Queue<PreparedStatementRow> queue = new LinkedBlockingQueue<>();
@@ -43,7 +44,15 @@ public class Consumer extends TimerTask {
     public Consumer(PickleXPBank plugin) {
         this.plugin = plugin;
     }
+    
+    public void queueAccount(Account account) {
+        queue.offer(new AccountRow(account));
+    }
 
+    public void queueXPSign(XPSign xpSign) {
+        queue.offer(new XPSignRow(xpSign));
+    }
+    
     @Override
     public void run() {
         if (queue.isEmpty()) { return; }
@@ -55,7 +64,9 @@ public class Consumer extends TimerTask {
             }
             conn.setAutoCommit(false);
 
-            while (!queue.isEmpty()) {
+            final long start = System.currentTimeMillis();
+            
+            while (!queue.isEmpty() && (System.currentTimeMillis() - start) < TIME_PER_RUN) {
                 final PreparedStatementRow row = queue.poll();
                 if (row == null) { continue; }
 
@@ -67,6 +78,7 @@ public class Consumer extends TimerTask {
                     Bukkit.getLogger().log(Level.SEVERE, "SQL exception on insertion: ", ex);
                 }
             }
+            conn.commit();
         }
         catch (final SQLException ex) {
             Bukkit.getLogger().log(Level.SEVERE, "SQL exception on insertion: ", ex);
@@ -138,15 +150,21 @@ public class Consumer extends TimerTask {
 
         @Override
         public void executeStatements() throws SQLException {
-            String sql = "INSERT INTO `pxpb_xpsigns` (account_id, x, y, z) values(?,?,?,?)";
             PreparedStatement ps = null;
             try {
-                ps = connection.prepareStatement(sql);
-                ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
-                ps.setInt(2, xpSign.getSign().getX());
-                ps.setInt(3, xpSign.getSign().getY());
-                ps.setInt(4, xpSign.getSign().getZ());
-                ps.executeUpdate();
+                if (xpSign.isRemoved()) {
+                    ps = getDeleteStatement(ps);
+                    
+                    xpSign.setIsRemoved(true);
+                }
+                else {
+                    ps = getInsertStatement(ps);
+                }
+                
+                if (ps != null) {
+                    ps.executeUpdate();
+                }
+                
             }
             //Don't bother catching and just let the caller handle it.
             finally {
@@ -162,7 +180,31 @@ public class Consumer extends TimerTask {
             }
             
         }
-    
+        
+        private PreparedStatement getInsertStatement(PreparedStatement ps) throws SQLException {
+            
+            String sql = "INSERT INTO `pxpb_xpsigns` (account_id, x, y, z) values(?,?,?,?)";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
+            ps.setInt(2, xpSign.getSign().getX());
+            ps.setInt(3, xpSign.getSign().getY());
+            ps.setInt(4, xpSign.getSign().getZ());
+
+            return ps;
+        }
+        
+        private PreparedStatement getDeleteStatement(PreparedStatement ps) throws SQLException {
+            
+            String sql = "DELETE FROM `pxpb_xpsigns` WHERE account_id=? AND x=? AND y=? AND z=?";
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
+            ps.setInt(2, xpSign.getSign().getX());
+            ps.setInt(3, xpSign.getSign().getY());
+            ps.setInt(4, xpSign.getSign().getZ());
+
+            return ps;
+        }
+
     }
     
     
