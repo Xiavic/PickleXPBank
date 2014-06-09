@@ -1,4 +1,10 @@
 settings:
+    mysql:
+        host: "localhost"
+        port: 3306
+        database: "minecraft_picklexpbank"
+        username: "root"
+        password: ""
     signCommand: "~XPBank~"
     removeRate: 10
     addRate: 10

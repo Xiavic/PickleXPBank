@@ -1,0 +1,170 @@
+/*
+ * Copyright (C) 2014 Pickle <curtisdhi@gmail.com>.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301  USA
+ */
+
+package net.picklecraft.picklexpbank;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Queue;
+import java.util.TimerTask;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.logging.Level;
+import net.picklecraft.picklexpbank.Accounts.Account;
+import org.bukkit.Bukkit;
+
+/**
+ * This code borrows a lot from https://github.com/LogBlock/LogBlock/blob/master/src/main/java/de/diddiz/LogBlock/Consumer.java
+ * Credit to Diddiz and the other logblock authors.
+ * @author Pickle <curtisdhi@gmail.com>
+ */
+public class Consumer extends TimerTask {
+    
+    private final PickleXPBank plugin;
+    
+    private final Queue<PreparedStatementRow> queue = new LinkedBlockingQueue<>();
+    
+    public Consumer(PickleXPBank plugin) {
+        this.plugin = plugin;
+    }
+
+    @Override
+    public void run() {
+        if (queue.isEmpty()) { return; }
+        
+        try {
+            final Connection conn = plugin.getConnection();
+            if (conn == null) {
+                return;
+            }
+            conn.setAutoCommit(false);
+
+            while (!queue.isEmpty()) {
+                final PreparedStatementRow row = queue.poll();
+                if (row == null) { continue; }
+
+                try {
+                    row.setConnection(conn);
+                    row.executeStatements();
+                }
+                catch (final SQLException ex) {
+                    Bukkit.getLogger().log(Level.SEVERE, "SQL exception on insertion: ", ex);
+                }
+            }
+        }
+        catch (final SQLException ex) {
+            Bukkit.getLogger().log(Level.SEVERE, "SQL exception on insertion: ", ex);
+        }
+        
+        
+    }
+    
+    private interface PreparedStatementRow
+    {
+
+        abstract void setConnection(Connection connection);
+        abstract void executeStatements() throws SQLException;
+
+    }
+    
+    private class AccountRow implements PreparedStatementRow {
+        private Connection connection;
+        private Account account;
+        
+        public AccountRow(Account account) {
+            this.account = account;
+        }
+        
+        @Override
+        public void setConnection(Connection connection) {
+            this.connection = connection;
+        }
+
+        @Override
+        public void executeStatements() throws SQLException {
+            String sql = "INSERT INTO `pxpb_accounts` (id, balance) values(?,?) on duplicate key update balance=?";
+            PreparedStatement ps = null;
+            try {
+                ps = connection.prepareStatement(sql);
+                ps.setString(1, account.getPlayer().getUniqueId().toString());
+                ps.setLong(2, account.getBalance());
+                ps.setLong(3, account.getBalance());
+                ps.executeUpdate();
+            }
+            //Don't bother catching and just let the caller handle it.
+            finally {
+            // individual try/catch here, though ugly, prevents resource leaks
+                if(ps != null) {
+                    try {
+                        ps.close();
+                    }
+                    catch(SQLException ex) {
+                        Bukkit.getLogger().severe(ex.getMessage());
+                    }
+                }
+            }
+        }
+    
+    }
+    
+    private class XPSignRow implements PreparedStatementRow {
+        private Connection connection;
+        private XPSign xpSign;
+        
+        public XPSignRow(XPSign xpSign) {
+            this.xpSign = xpSign;
+        }
+        
+        @Override
+        public void setConnection(Connection connection) {
+            this.connection = connection;
+        }
+
+        @Override
+        public void executeStatements() throws SQLException {
+            String sql = "INSERT INTO `pxpb_xpsigns` (account_id, x, y, z) values(?,?,?,?)";
+            PreparedStatement ps = null;
+            try {
+                ps = connection.prepareStatement(sql);
+                ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
+                ps.setInt(2, xpSign.getSign().getX());
+                ps.setInt(3, xpSign.getSign().getY());
+                ps.setInt(4, xpSign.getSign().getZ());
+                ps.executeUpdate();
+            }
+            //Don't bother catching and just let the caller handle it.
+            finally {
+            // individual try/catch here, though ugly, prevents resource leaks
+                if(ps != null) {
+                    try {
+                        ps.close();
+                    }
+                    catch(SQLException ex) {
+                        Bukkit.getLogger().severe(ex.getMessage());
+                    }
+                }
+            }
+            
+        }
+    
+    }
+    
+    
+}
+
