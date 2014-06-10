@@ -20,6 +20,7 @@
 package net.picklecraft.picklexpbank;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import net.picklecraft.Util.MySQLConnectionPool;
 import net.picklecraft.picklexpbank.Accounts.AccountManager;
@@ -59,7 +60,7 @@ public class PickleXPBank extends JavaPlugin {
         final String url = "jdbc:mysql://" + host + ":" + port + "/" + database + "?useUnicode=true&characterEncoding=utf-8";
         
         try {
-            getLogger().info("Connecting to " + user + "@" + url + "...");
+            getLogger().log(Level.INFO, "Connecting to {0}@{1}...", new Object[]{user, url});
             sqlPool = new MySQLConnectionPool(url, user, password);
             final Connection conn = getConnection();
             if (conn == null) {
@@ -67,12 +68,19 @@ public class PickleXPBank extends JavaPlugin {
             }
             conn.close();
         } 
-        catch (final NullPointerException ex) {
-            getLogger().log(Level.SEVERE, "Error while loading: ", ex);
-        } 
         catch (final Exception ex) {
-            getLogger().severe("Error while loading: " + ex.getMessage());
+            getLogger().log(Level.SEVERE, "Error while loading: {0}", ex.getMessage());
         }
+        
+        Updater updater = new Updater(this);
+        try {
+            updater.checkTables();
+        }
+        catch (final SQLException ex) {
+            getLogger().log(Level.SEVERE, "[SQLException] Unable to create tables.. {0}", ex.getMessage());
+        }
+        updater.loadFromSql(accountManager);
+        
         consumer = new Consumer(this);
         accountManager = new AccountManager(this);
         
@@ -81,9 +89,9 @@ public class PickleXPBank extends JavaPlugin {
     @Override 
     public void onEnable() {
         
-        
         getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
         getServer().getScheduler().runTaskTimer(this, accountManager, 0, 20);
+        
     }
     
     @Override 

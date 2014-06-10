@@ -41,6 +41,7 @@ public class Account {
     
     public void setBalance(long balance) {
         this.balance = balance;
+        PickleXPBank.getInstance().getConsumer().queueAccount(this);
     }
     
     public long getBalance() {
@@ -48,11 +49,11 @@ public class Account {
     }
     
     public void addBalance(long amount) {
-        balance += amount;
+        setBalance(balance + amount);
         player.setTotalExperience(player.getTotalExperience() - (int)amount);
     }
     public void subBalance(long amount) {
-        balance -= amount;
+        setBalance(balance - amount);
         player.setTotalExperience(player.getTotalExperience() + (int)amount);
     }
 
