@@ -19,6 +19,8 @@
 
 package net.picklecraft.picklexpbank.Factories;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 import net.picklecraft.picklexpbank.Accounts.Account;
 import org.bukkit.Bukkit;
@@ -31,6 +33,9 @@ import org.bukkit.entity.Player;
 public class AccountFactory {
     
     public static Account createAccount(Player player) {
+        if (player == null) {
+            return null;
+        }
         return new Account(player);
     }
     
@@ -39,4 +44,14 @@ public class AccountFactory {
         return createAccount(player);
     }
     
+    public static Account createAccount(ResultSet rs) throws SQLException {
+        UUID uuid = UUID.fromString(rs.getString("id"));  
+        Account account = createAccount(uuid);
+        
+        if (account != null) {
+            account.setBalance(rs.getLong("balance"));
+        }
+        
+        return account;
+    }
 } 

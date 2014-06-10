@@ -97,7 +97,7 @@ public class Consumer extends TimerTask {
     
     private class AccountRow implements PreparedStatementRow {
         private Connection connection;
-        private Account account;
+        private final Account account;
         
         public AccountRow(Account account) {
             this.account = account;
@@ -137,7 +137,7 @@ public class Consumer extends TimerTask {
     
     private class XPSignRow implements PreparedStatementRow {
         private Connection connection;
-        private XPSign xpSign;
+        private final XPSign xpSign;
         
         public XPSignRow(XPSign xpSign) {
             this.xpSign = xpSign;

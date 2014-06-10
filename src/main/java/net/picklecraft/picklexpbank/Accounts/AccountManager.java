@@ -60,6 +60,9 @@ public class AccountManager extends TimerTask {
     }
     
     public void addAccount(Account account) {
+        if (account == null) {
+            return;
+        }
         plugin.getConsumer().queueAccount(account);
         accounts.add(account);
     }
@@ -81,6 +84,9 @@ public class AccountManager extends TimerTask {
     }
     
     public void addXPSign(XPSign xpSign) {
+        if (xpSign == null) {
+            return;
+        }
         plugin.getConsumer().queueXPSign(xpSign);
         xpSigns.add(xpSign);
     }

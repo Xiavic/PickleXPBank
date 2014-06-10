@@ -19,11 +19,17 @@
 
 package net.picklecraft.picklexpbank.Factories;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.UUID;
 import net.picklecraft.picklexpbank.Accounts.Account;
+import static net.picklecraft.picklexpbank.Factories.AccountFactory.createAccount;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
@@ -42,6 +48,17 @@ public class XPSignFactory {
         Player player = Bukkit.getServer().getPlayer(uuid);
         Account account = PickleXPBank.getInstance().getAccountManager().getAccount(player);
         return createXPSign(sign, account);
+    }
+    
+    public static XPSign createXPSign(Account account, ResultSet rs) throws SQLException {
+        Server server = PickleXPBank.getInstance().getServer();
+        World world = server.getWorld(rs.getString("world"));
+        Block block = world.getBlockAt(rs.getInt("x"),rs.getInt("y"), rs.getInt("z"));
+        
+        if (block.getState() instanceof Sign) {
+            return createXPSign((Sign)block.getState(), account);
+        }
+        return null; 
     }
     
 }
