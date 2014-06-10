@@ -19,10 +19,14 @@
 
 package net.picklecraft.picklexpbank.Listeners;
 
+import java.util.ArrayList;
+import java.util.List;
 import net.picklecraft.picklexpbank.Accounts.Account;
 import net.picklecraft.picklexpbank.Factories.XPSignFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -61,14 +65,14 @@ public class XPSignListener implements Listener {
             }
             
         }
-        else {
+        /*else {
             //Incase a plugin modifies the sign
             XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getBlock().getState());
             if (xpSign != null) {
                 PickleXPBank.getInstance().getAccountManager().removeXPSign(xpSign);
             }
             
-        }
+        }*/
     }
     
     @EventHandler(priority = EventPriority.NORMAL)
@@ -105,10 +109,8 @@ public class XPSignListener implements Listener {
             
             XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getBlock().getState());
             if (xpSign != null) {
-                if (event.getPlayer() == xpSign.getAccount().getPlayer()) {
-                    
+                if (xpSign.canPlayerRemove(event.getPlayer())) {
                     PickleXPBank.getInstance().getAccountManager().removeXPSign(xpSign);
-                    
                 }
                 else {
                     event.getPlayer().sendMessage("Hey! that's not yours!");
@@ -117,6 +119,57 @@ public class XPSignListener implements Listener {
             }
             
         }
+        else {
+            //Search for a nearby sign
+            List<Sign> signs = findSignNearBlock(event.getBlock());
+            for (Sign sign : signs) {
+                //if an xpsign exists, we need to cancel!
+                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign(sign);
+                if (xpSign != null) {
+                    event.getPlayer().sendMessage("You need to break the XpSign first.");
+                    event.setCancelled(true);
+                    break;
+                }
+            }
+            
+        }
+        
+    }
+    
+    /*
+    * this method finds signs that may be attached to a nearby block
+    *   wS          wS = Wall sign 
+    * wSBwS    S    S  = Standing sign
+    *   wS     B    B  = Block
+    */
+    public List<Sign> findSignNearBlock(Block block) {
+        List<Sign> signs = new ArrayList(5);
+        for (int i = 0; i < 5; i++) {
+            int x = 0, y = 0, z = 0;
+            switch(i) {
+                case 0:
+                    x += 1;
+                    break;
+                case 1:
+                    x -= 1;
+                    break;
+                case 2:
+                    z += 1;
+                    break;
+                case 3:
+                    z -= 1;
+                    break;
+                case 4:
+                    y += 1;
+                    break;
+            }
+            BlockState bs = block.getRelative(x, y, z).getState();
+            if (bs instanceof Sign) {
+                signs.add((Sign)bs);
+            }
+        }
+        
+        return signs;
     }
     
 }

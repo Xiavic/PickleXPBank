@@ -21,6 +21,7 @@ package net.picklecraft.picklexpbank;
 
 import net.picklecraft.picklexpbank.Accounts.Account;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -57,6 +58,13 @@ public class XPSign {
         sign.setLine(2, ownerAccount.getPlayer().getName());
         sign.setLine(4, String.valueOf(ownerAccount.getBalance()));
         
+    }
+    
+    public boolean canPlayerRemove(Player player) {
+        if (player == ownerAccount.getPlayer() || player.hasPermission("PickleXPBank.admin.destroy")) {
+            return true;
+        }
+        return false;
     }
     
     
