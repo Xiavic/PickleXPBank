@@ -57,7 +57,7 @@ public class XPSign {
     public void update() {
         sign.setLine(1, ownerAccount.getPlayer().getName());
         sign.setLine(3, String.valueOf(ownerAccount.getBalance()));
-        
+        sign.update();
     }
     
     public boolean canPlayerRemove(Player player) {
