@@ -23,9 +23,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import net.picklecraft.Util.MySQLConnectionPool;
+import net.picklecraft.picklexpbank.Accounts.Account;
 import net.picklecraft.picklexpbank.Accounts.AccountManager;
 import net.picklecraft.picklexpbank.Listeners.XPSignListener;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -81,10 +85,13 @@ public class PickleXPBank extends JavaPlugin {
         catch (final SQLException ex) {
             getLogger().log(Level.SEVERE, "[SQLException] Unable to create tables.. {0}", ex.getMessage());
         }
-        updater.loadFromSql(accountManager);
         
         consumer = new Consumer(this);
         accountManager = new AccountManager(this);
+        
+        updater.loadFromSql(accountManager);
+        
+
     }
     
     @Override 
@@ -110,6 +117,45 @@ public class PickleXPBank extends JavaPlugin {
     @Override 
     public void onDisable() {
         
+    }
+    
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length >= 2) {
+            final Player player = getPlayer(args[0]);
+            if (player == null) {
+                sender.sendMessage("Either too many matches for "+ args[0] +" or isn't online.");
+                return true;
+            }
+            int amount = 0;
+            try {
+                amount = Integer.parseInt(args[1]);
+            }
+            catch (NumberFormatException ex) {
+                sender.sendMessage("The value must be an integer");
+                return true;
+            }
+            
+            final Account account = accountManager.getAccount(player);
+            
+            if (command.getName().equalsIgnoreCase("xpadd")) {
+                account.addBalance(amount);
+                sender.sendMessage("Added "+ amount +" to "+ player.getName());
+                return true;
+            }
+            else if (command.getName().equalsIgnoreCase("xpsub")) {
+                account.subBalance(amount);
+                sender.sendMessage("Subtracted "+ amount +" from "+ player.getName());
+                return true;
+            }
+            else if (command.getName().equalsIgnoreCase("xpset")) {
+                account.setBalance(amount);
+                sender.sendMessage("Set "+ player.getName() +" to "+ amount);
+                return true;
+            }
+        }
+        
+        return false;
     }
     
     
@@ -142,4 +188,31 @@ public class PickleXPBank extends JavaPlugin {
         return accountManager;
     }
     
+    
+    /*
+     * Will return a player name if a match was found,
+     * else it shall return null
+     *
+     * @return Player
+     */
+    public static Player getPlayer(String name) {
+        Player playerMatch = null;
+        name = name.toLowerCase();
+        int playerMatches = 0;
+        for (Player p : Bukkit.getServer().getOnlinePlayers()) {
+            String name2 = p.getName().toLowerCase();
+            if (name2.contains(name)) {
+                playerMatch = p;
+                if (name2.equals(name)) {
+                    break;
+                } 
+                //If a second match is found, set playerMatch to null and break out
+                else if (++playerMatches > 1) {
+                    playerMatch = null;
+                    break;
+                }
+            }
+        }
+        return playerMatch;
+    }
 }

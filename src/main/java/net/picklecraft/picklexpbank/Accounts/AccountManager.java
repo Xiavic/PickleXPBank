@@ -88,6 +88,7 @@ public class AccountManager extends TimerTask {
     }
     
     public XPSign getXPSign(Sign sign) {
+        plugin.getLogger().info(""+xpSigns.size());
         for (XPSign xpSign : xpSigns) {
             if (xpSign.getSign() == sign) {
                 return xpSign;

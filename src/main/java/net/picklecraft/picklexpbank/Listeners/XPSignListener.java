@@ -81,18 +81,20 @@ public class XPSignListener implements Listener {
             if (event.getClickedBlock().getState() instanceof Sign) {
                 XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getClickedBlock().getState());
                 if (xpSign != null) {
-
+                    event.getPlayer().sendMessage(""+xpSign.getAccount().getBalance());
                     if (event.getPlayer().getUniqueId().compareTo(xpSign.getAccount().getPlayer().getUniqueId()) == 0) {
 
                         //Left click removes from the balance and adds to the player.
                         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                             final long rate = plugin.getConfig().getLong("settings.removeRate");
                             xpSign.getAccount().subBalance(rate);
+                            event.getPlayer().sendMessage("Subtracted "+ rate +" from your account");
                         }
                         //Right click adds to the sign and removes from the player
                         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                             final long rate = plugin.getConfig().getLong("settings.addRate");
                             xpSign.getAccount().addBalance(rate);
+                            event.getPlayer().sendMessage("Added "+ rate +" to your account");
                         }
 
                     }
