@@ -77,28 +77,30 @@ public class XPSignListener implements Listener {
     
     @EventHandler(priority = EventPriority.NORMAL)
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
-        if (event.getClickedBlock().getState() instanceof Sign) {
-            XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getClickedBlock().getState());
-            if (xpSign != null) {
-                
-                if (event.getPlayer() == xpSign.getAccount().getPlayer()) {
-                    
-                    //Left click removes from the balance and adds to the player.
-                    if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                        final long rate = plugin.getConfig().getLong("settings.removeRate");
-                        xpSign.getAccount().subBalance(rate);
+        if (event.getClickedBlock() != null) {
+            if (event.getClickedBlock().getState() instanceof Sign) {
+                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getClickedBlock().getState());
+                if (xpSign != null) {
+
+                    if (event.getPlayer().getUniqueId().compareTo(xpSign.getAccount().getPlayer().getUniqueId()) == 0) {
+
+                        //Left click removes from the balance and adds to the player.
+                        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                            final long rate = plugin.getConfig().getLong("settings.removeRate");
+                            xpSign.getAccount().subBalance(rate);
+                        }
+                        //Right click adds to the sign and removes from the player
+                        else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                            final long rate = plugin.getConfig().getLong("settings.addRate");
+                            xpSign.getAccount().addBalance(rate);
+                        }
+
                     }
-                    //Right click adds to the sign and removes from the player
-                    else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                        final long rate = plugin.getConfig().getLong("settings.addRate");
-                        xpSign.getAccount().addBalance(rate);
+                    else {
+                        event.getPlayer().sendMessage("Hey! that's not yours!");
                     }
-                    
+
                 }
-                else {
-                    event.getPlayer().sendMessage("Hey! that's not yours!");
-                }
-                
             }
         }
     }

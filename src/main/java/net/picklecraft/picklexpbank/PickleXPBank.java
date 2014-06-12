@@ -83,6 +83,8 @@ public class PickleXPBank extends JavaPlugin {
         }
         updater.loadFromSql(accountManager);
         
+        consumer = new Consumer(this);
+        accountManager = new AccountManager(this);
     }
     
     @Override 
@@ -95,8 +97,7 @@ public class PickleXPBank extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Not connected to a database. Disabling plugin.");
             return;
         }
-        consumer = new Consumer(this);
-        accountManager = new AccountManager(this);
+
         
         getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
         getServer().getScheduler().runTaskTimer(this, accountManager, 0, 20);

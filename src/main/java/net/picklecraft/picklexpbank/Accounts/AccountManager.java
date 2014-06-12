@@ -27,7 +27,6 @@ import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  *
@@ -45,14 +44,6 @@ public class AccountManager extends TimerTask {
     public AccountManager(PickleXPBank plugin) {
         this.plugin = plugin;
 
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                updateXPSigns();
-            }
-        }.runTaskTimer(plugin, 0, UPDATE_SIGN_RATE);   
-        
     }
     
     public PickleXPBank getPlugin() {

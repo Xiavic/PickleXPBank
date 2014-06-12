@@ -55,6 +55,7 @@ public class XPSign {
     }
     
     public void update() {
+        sign.setLine(0, PickleXPBank.getInstance().getConfig().getString("settings.signCommand"));
         sign.setLine(1, ownerAccount.getPlayer().getName());
         sign.setLine(3, String.valueOf(ownerAccount.getBalance()));
         sign.update();
