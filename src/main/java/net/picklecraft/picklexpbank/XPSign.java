@@ -55,8 +55,8 @@ public class XPSign {
     }
     
     public void update() {
-        sign.setLine(2, ownerAccount.getPlayer().getName());
-        sign.setLine(4, String.valueOf(ownerAccount.getBalance()));
+        sign.setLine(1, ownerAccount.getPlayer().getName());
+        sign.setLine(3, String.valueOf(ownerAccount.getBalance()));
         
     }
     
