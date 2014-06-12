@@ -183,24 +183,26 @@ public class Consumer extends TimerTask {
         
         private PreparedStatement getInsertStatement(PreparedStatement ps) throws SQLException {
             
-            String sql = "INSERT INTO `pxpb_xpsigns` (account_id, x, y, z) values(?,?,?,?)";
+            String sql = "INSERT INTO `pxpb_xpsigns` (account_id, world, x, y, z) values(?,?,?,?,?)";
             ps = connection.prepareStatement(sql);
             ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
-            ps.setInt(2, xpSign.getSign().getX());
-            ps.setInt(3, xpSign.getSign().getY());
-            ps.setInt(4, xpSign.getSign().getZ());
+            ps.setString(2, xpSign.getSign().getWorld().getName());
+            ps.setInt(3, xpSign.getSign().getX());
+            ps.setInt(4, xpSign.getSign().getY());
+            ps.setInt(5, xpSign.getSign().getZ());
 
             return ps;
         }
         
         private PreparedStatement getDeleteStatement(PreparedStatement ps) throws SQLException {
             
-            String sql = "DELETE FROM `pxpb_xpsigns` WHERE account_id=? AND x=? AND y=? AND z=?";
+            String sql = "DELETE FROM `pxpb_xpsigns` WHERE account_id=? AND world=? AND x=? AND y=? AND z=?";
             ps = connection.prepareStatement(sql);
             ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
-            ps.setInt(2, xpSign.getSign().getX());
-            ps.setInt(3, xpSign.getSign().getY());
-            ps.setInt(4, xpSign.getSign().getZ());
+            ps.setString(2, xpSign.getSign().getWorld().getName());
+            ps.setInt(3, xpSign.getSign().getX());
+            ps.setInt(4, xpSign.getSign().getY());
+            ps.setInt(5, xpSign.getSign().getZ());
 
             return ps;
         }

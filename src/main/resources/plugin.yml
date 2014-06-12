@@ -1,5 +1,5 @@
 name: PickleXPBank
-main: net.picklecraft.PickleXPBank
+main: net.picklecraft.picklexpbank.PickleXPBank
 author: [Pickle,ImHandMade]
 version: 0.1
 description: Allows players to store XP points, not levels, into signs.

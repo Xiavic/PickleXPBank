@@ -46,8 +46,8 @@ public class Updater {
     
     public void loadFromSql(AccountManager accountManager) {
         final Connection conn = plugin.getConnection();
-        final String selectAccountsStatement = "SELECT FROM `pxpb_accounts`;";
-        final String selectXPSignsStatement = "SELECT FROM `pxpb_xpsigns` WHERE account_id = ?;";
+        final String selectAccountsStatement = "SELECT * FROM `pxpb_accounts`;";
+        final String selectXPSignsStatement = "SELECT * FROM `pxpb_xpsigns` WHERE account_id = ?;";
         try (PreparedStatement psAccounts = conn.prepareStatement(selectAccountsStatement)) {
             final ResultSet rsAccounts = psAccounts.executeQuery();
             
@@ -90,11 +90,11 @@ public class Updater {
         final DatabaseMetaData dbm = conn.getMetaData();
         conn.setAutoCommit(true);
 
-        createTable(dbm, state, "pxpb_accounts", "id char(32) NOT NULL,"+
+        createTable(dbm, state, "pxpb_accounts", "(id char(32) NOT NULL,"+
             " balance bigint(20) NOT NULL, PRIMARY KEY (id), UNIQUE KEY player_id (id))"+
             " ENGINE=InnoDB DEFAULT CHARSET=utf8;");
             
-        createTable(dbm, state, "pxpb_xpsigns", "id int(11) NOT NULL AUTO_INCREMENT,"+
+        createTable(dbm, state, "pxpb_xpsigns", "(id int(11) NOT NULL AUTO_INCREMENT,"+
             " account_id int(11) NOT NULL, world varchar(20) NOT NULL, x int(11) NOT NULL,"+
             " y int(11) NOT NULL, z int(11) NOT NULL, PRIMARY KEY (id))"+
             " ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;");

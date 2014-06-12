@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import net.picklecraft.Util.MySQLConnectionPool;
 import net.picklecraft.picklexpbank.Accounts.AccountManager;
+import net.picklecraft.picklexpbank.Listeners.XPSignListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -66,6 +67,7 @@ public class PickleXPBank extends JavaPlugin {
             if (conn == null) {
                 return;
             }
+            connected = true;
             conn.close();
         } 
         catch (final Exception ex) {
@@ -81,16 +83,26 @@ public class PickleXPBank extends JavaPlugin {
         }
         updater.loadFromSql(accountManager);
         
-        consumer = new Consumer(this);
-        accountManager = new AccountManager(this);
-        
     }
     
     @Override 
     public void onEnable() {
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        
+        if (!connected) {
+            Bukkit.getPluginManager().disablePlugin(this);
+            getLogger().log(Level.SEVERE, "Not connected to a database. Disabling plugin.");
+            return;
+        }
+        consumer = new Consumer(this);
+        accountManager = new AccountManager(this);
         
         getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
         getServer().getScheduler().runTaskTimer(this, accountManager, 0, 20);
+        
+        XPSignListener listener = new XPSignListener(this);
+        Bukkit.getPluginManager().registerEvents(listener, this);
         
     }
     
