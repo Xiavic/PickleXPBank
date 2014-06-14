@@ -54,10 +54,10 @@ public class XPSignListener implements Listener {
         final String signCommand = plugin.getConfig().getString("settings.signCommand");
         if (event.getLine(0).equalsIgnoreCase(signCommand)) {
             
-            Account account = PickleXPBank.getInstance().getAccountManager().getAccount(event.getPlayer());
+            Account account = PickleXPBank.getInstance().getAccountManager().getAccount(event.getPlayer().getUniqueId());
             
             if (account.canPlaceXPSign()) {        
-                    XPSign xPSign = XPSignFactory.createXPSign((Sign)event.getBlock().getState(), account);
+                    XPSign xPSign = XPSignFactory.createXPSign(event.getBlock().getLocation(), account);
                     PickleXPBank.getInstance().getAccountManager().addXPSign(xPSign);
             }
             else {
@@ -79,7 +79,7 @@ public class XPSignListener implements Listener {
     public void onPlayerInteractEvent(PlayerInteractEvent event) {
         if (event.getClickedBlock() != null) {
             if (event.getClickedBlock().getState() instanceof Sign) {
-                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getClickedBlock().getState());
+                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign(event.getClickedBlock().getLocation());
                 if (xpSign != null) {
                     event.getPlayer().sendMessage(""+xpSign.getAccount().getBalance());
                     if (event.getPlayer().getUniqueId().compareTo(xpSign.getAccount().getPlayer().getUniqueId()) == 0) {
@@ -111,7 +111,7 @@ public class XPSignListener implements Listener {
     public void onBlockBreakEvent(BlockBreakEvent event) {
         if (event.getBlock().getState() instanceof Sign) {
             
-            XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign((Sign)event.getBlock().getState());
+            XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign(event.getBlock().getLocation());
             if (xpSign != null) {
                 if (xpSign.canPlayerRemove(event.getPlayer())) {
                     PickleXPBank.getInstance().getAccountManager().removeXPSign(xpSign);
@@ -128,7 +128,7 @@ public class XPSignListener implements Listener {
             List<Sign> signs = findSignNearBlock(event.getBlock());
             for (Sign sign : signs) {
                 //if an xpsign exists, we need to cancel!
-                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign(sign);
+                XPSign xpSign = PickleXPBank.getInstance().getAccountManager().getXPSign(sign.getLocation());
                 if (xpSign != null) {
                     event.getPlayer().sendMessage("You need to break the XpSign first.");
                     event.setCancelled(true);

@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank.Accounts;
 
+import java.util.UUID;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import org.bukkit.entity.Player;
 
@@ -28,15 +29,16 @@ import org.bukkit.entity.Player;
  */
 public class Account {
     
-    private final Player player;
+    private final UUID uuid;
+    private String playerName;
     private long balance;
     
-    public Account(Player player, long balance) {
-        this.player = player;
+    public Account(UUID uuid, long balance) {
+        this.uuid = uuid;
         this.balance = balance;
     }
-    public Account(Player player) {
-        this(player, 0);
+    public Account(UUID uuid) {
+        this(uuid, 0);
     }
     
     public void setBalance(long balance) {
@@ -49,20 +51,37 @@ public class Account {
     }
     
     public void addBalance(long amount) {
+        final Player player = getPlayer();
         setBalance(balance + amount);
+        
         player.setTotalExperience(player.getTotalExperience() - (int)amount);
     }
     public void subBalance(long amount) {
+        final Player player = getPlayer();
         setBalance(balance - amount);
         player.setTotalExperience(player.getTotalExperience() + (int)amount);
     }
 
+    public UUID getUuid() {
+        return uuid;
+    }
+    
     public Player getPlayer() {
+        Player player = PickleXPBank.getInstance().getServer().getPlayer(uuid);
+
         return player;
     }
     
+    public void setPlayerName(String name) {
+        playerName = name;
+    }
+    
+    public String getPlayerName() {
+        return playerName;
+    }
+    
     public boolean canPlaceXPSign() {
-        
+        final Player player = getPlayer();
         if (player.hasPermission("PickleXPBank.placeSign")) {
             
             final AccountManager acManager = PickleXPBank.getInstance().getAccountManager();

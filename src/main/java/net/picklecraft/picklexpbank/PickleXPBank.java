@@ -43,8 +43,11 @@ public class PickleXPBank extends JavaPlugin {
     
     private static PickleXPBank instance;
     
+    private Updater updater;
+    
     private Consumer consumer;
     private AccountManager accountManager;
+    
     
     public static PickleXPBank getInstance() {
         if (instance == null) {
@@ -55,6 +58,9 @@ public class PickleXPBank extends JavaPlugin {
     
     @Override
     public void onLoad() {
+        getConfig().options().copyDefaults(true);
+        saveConfig();
+        
         instance = this;
         
         final String host = getConfig().getString("settings.mysql.host");
@@ -78,7 +84,7 @@ public class PickleXPBank extends JavaPlugin {
             getLogger().log(Level.SEVERE, "Error while loading: {0}", ex.getMessage());
         }
         
-        Updater updater = new Updater(this);
+        updater = new Updater(this);
         try {
             updater.checkTables();
         }
@@ -87,25 +93,20 @@ public class PickleXPBank extends JavaPlugin {
         }
         
         consumer = new Consumer(this);
-        accountManager = new AccountManager(this);
-        
-        updater.loadFromSql(accountManager);
-        
+        accountManager = new AccountManager(this); 
 
     }
     
     @Override 
     public void onEnable() {
-        getConfig().options().copyDefaults(true);
-        saveConfig();
-        
         if (!connected) {
             Bukkit.getPluginManager().disablePlugin(this);
             getLogger().log(Level.SEVERE, "Not connected to a database. Disabling plugin.");
             return;
         }
-
         
+       updater.loadFromSql(accountManager);
+
         getServer().getScheduler().runTaskTimerAsynchronously(this, consumer, 0, 60*20);
         getServer().getScheduler().runTaskTimer(this, accountManager, 0, 20);
         
@@ -136,7 +137,7 @@ public class PickleXPBank extends JavaPlugin {
                 return true;
             }
             
-            final Account account = accountManager.getAccount(player);
+            final Account account = accountManager.getAccount(player.getUniqueId());
             
             if (command.getName().equalsIgnoreCase("xpadd")) {
                 account.addBalance(amount);

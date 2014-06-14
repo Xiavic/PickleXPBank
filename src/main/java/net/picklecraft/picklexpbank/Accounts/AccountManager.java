@@ -22,9 +22,11 @@ package net.picklecraft.picklexpbank.Accounts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
+import java.util.UUID;
 import net.picklecraft.picklexpbank.Factories.AccountFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
+import org.bukkit.Location;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
@@ -62,14 +64,14 @@ public class AccountManager extends TimerTask {
         accounts.remove(account);
     }
     
-    public Account getAccount(Player player) {
+    public Account getAccount(UUID uuid) {
         for (Account account : accounts) {
-            if (account.getPlayer() == player) {
+            if (account.getUuid().compareTo(uuid) == 0) {
                 return account;
             }
         }
         //no account existes, so lets make one.
-        Account account = AccountFactory.createAccount(player);
+        Account account = AccountFactory.createAccount(uuid);
         addAccount(account);
         return account;
     }
@@ -87,10 +89,13 @@ public class AccountManager extends TimerTask {
         xpSigns.remove(xpSign);
     }
     
-    public XPSign getXPSign(Sign sign) {
-        plugin.getLogger().info(""+xpSigns.size());
+    public XPSign getXPSign(Location location) {
+        
         for (XPSign xpSign : xpSigns) {
-            if (xpSign.getSign() == sign) {
+            if (xpSign.getLocation().getWorld().getUID().compareTo(location.getWorld().getUID()) == 0 &&
+                    xpSign.getLocation().getBlockX() == location.getBlockX() &&
+                    xpSign.getLocation().getBlockY() == location.getBlockY() &&
+                    xpSign.getLocation().getBlockZ() == location.getBlockZ()) {  
                 return xpSign;
             }
         }

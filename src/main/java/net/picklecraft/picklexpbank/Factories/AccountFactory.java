@@ -32,16 +32,19 @@ import org.bukkit.entity.Player;
  */
 public class AccountFactory {
     
-    public static Account createAccount(Player player) {
-        if (player == null) {
-            return null;
-        }
-        return new Account(player);
-    }
     
     public static Account createAccount(UUID uuid) {
-        Player player = Bukkit.getServer().getPlayer(uuid);
-        return createAccount(player);
+        if (uuid == null) {
+            return null;
+        }
+        Account account = new Account(uuid);
+        if (account.getPlayer() != null) {
+            account.setPlayerName(account.getPlayer().getName());
+        }
+        return account;
+    }
+    public static Account createAccount(Player player) {
+        return createAccount(player.getUniqueId());
     }
     
     public static Account createAccount(ResultSet rs) throws SQLException {
@@ -49,7 +52,9 @@ public class AccountFactory {
         Account account = createAccount(uuid);
         
         if (account != null) {
+            Bukkit.getLogger().info(String.valueOf(rs.getLong("balance")));
             account.setBalance(rs.getLong("balance"));
+            account.setPlayerName(rs.getString("name"));
         }
         
         return account;

@@ -57,11 +57,12 @@ public class Updater {
                 
                 //this server doesn't recongize this player?
                 if (account == null) {
+                    plugin.getLogger().info("Account Null!");
                     continue;
                 }
                 
                 try (PreparedStatement psSigns = conn.prepareStatement(selectXPSignsStatement)) {
-                    psSigns.setString(1, account.getPlayer().getUniqueId().toString());
+                    psSigns.setString(1, account.getUuid().toString());
                     final ResultSet rsSigns = psSigns.executeQuery();
 
                     while (rsSigns.next()) {
@@ -90,7 +91,7 @@ public class Updater {
         final DatabaseMetaData dbm = conn.getMetaData();
         conn.setAutoCommit(true);
 
-        createTable(dbm, state, "pxpb_accounts", "(id char(36) NOT NULL,"+
+        createTable(dbm, state, "pxpb_accounts", "(id char(36) NOT NULL, name varchar(30) NOT NULL,"+
             " balance bigint(20) NOT NULL, PRIMARY KEY (id), UNIQUE KEY player_id (id))"+
             " ENGINE=InnoDB DEFAULT CHARSET=utf8;");
             

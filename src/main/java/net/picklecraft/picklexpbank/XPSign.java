@@ -20,6 +20,8 @@
 package net.picklecraft.picklexpbank;
 
 import net.picklecraft.picklexpbank.Accounts.Account;
+import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 
@@ -28,18 +30,19 @@ import org.bukkit.entity.Player;
  * @author Pickle <curtisdhi@gmail.com>
  */
 public class XPSign {
-    private final Sign sign;
+    private final Location location;
+    
     private final Account ownerAccount;
     
     private boolean isRemoved;
     
-    public XPSign(Sign sign, Account ownerAccount) {
-        this.sign = sign;
+    public XPSign(Location location, Account ownerAccount) {
+        this.location = location;
         this.ownerAccount = ownerAccount;
     }
     
-    public Sign getSign() {
-        return sign;
+    public Location getLocation() {
+        return location;
     }
     
     public Account getAccount() {
@@ -55,10 +58,17 @@ public class XPSign {
     }
     
     public void update() {
-        sign.setLine(0, PickleXPBank.getInstance().getConfig().getString("settings.signCommand"));
-        sign.setLine(1, ownerAccount.getPlayer().getName());
-        sign.setLine(3, String.valueOf(ownerAccount.getBalance()));
-        sign.update();
+        Block b = location.getBlock();
+        if (b.getState() instanceof Sign) {
+            Sign sign = (Sign)b.getState();
+            sign.setLine(0, PickleXPBank.getInstance().getConfig().getString("settings.signCommand"));
+            sign.setLine(1, ownerAccount.getPlayerName());
+            sign.setLine(3, String.valueOf(ownerAccount.getBalance()));
+            sign.update();
+        }
+        else {
+            isRemoved = true;
+        }
     }
     
     public boolean canPlayerRemove(Player player) {

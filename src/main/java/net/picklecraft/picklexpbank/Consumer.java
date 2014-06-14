@@ -110,13 +110,15 @@ public class Consumer extends TimerTask {
 
         @Override
         public void executeStatements() throws SQLException {
-            String sql = "INSERT INTO `pxpb_accounts` (id, balance) values(?,?) on duplicate key update balance=?";
+            String sql = "INSERT INTO `pxpb_accounts` (id, name, balance) values(?,?,?) on duplicate key update balance=?";
             PreparedStatement ps = null;
             try {
                 ps = connection.prepareStatement(sql);
-                ps.setString(1, account.getPlayer().getUniqueId().toString());
-                ps.setLong(2, account.getBalance());
+                ps.setString(1, account.getUuid().toString());
+                ps.setString(2, account.getPlayerName());
                 ps.setLong(3, account.getBalance());
+                ps.setLong(4, account.getBalance());
+                
                 ps.executeUpdate();
             }
             //Don't bother catching and just let the caller handle it.
@@ -185,11 +187,11 @@ public class Consumer extends TimerTask {
             
             String sql = "INSERT INTO `pxpb_xpsigns` (account_id, world, x, y, z) values(?,?,?,?,?)";
             ps = connection.prepareStatement(sql);
-            ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
-            ps.setString(2, xpSign.getSign().getWorld().getName());
-            ps.setInt(3, xpSign.getSign().getX());
-            ps.setInt(4, xpSign.getSign().getY());
-            ps.setInt(5, xpSign.getSign().getZ());
+            ps.setString(1, xpSign.getAccount().getUuid().toString());
+            ps.setString(2, xpSign.getLocation().getWorld().getName());
+            ps.setInt(3, xpSign.getLocation().getBlockX());
+            ps.setInt(4, xpSign.getLocation().getBlockY());
+            ps.setInt(5, xpSign.getLocation().getBlockZ());
 
             return ps;
         }
@@ -198,11 +200,11 @@ public class Consumer extends TimerTask {
             
             String sql = "DELETE FROM `pxpb_xpsigns` WHERE account_id=? AND world=? AND x=? AND y=? AND z=?";
             ps = connection.prepareStatement(sql);
-            ps.setString(1, xpSign.getAccount().getPlayer().getUniqueId().toString());
-            ps.setString(2, xpSign.getSign().getWorld().getName());
-            ps.setInt(3, xpSign.getSign().getX());
-            ps.setInt(4, xpSign.getSign().getY());
-            ps.setInt(5, xpSign.getSign().getZ());
+            ps.setString(1, xpSign.getAccount().getUuid().toString());
+            ps.setString(2, xpSign.getLocation().getWorld().getName());
+            ps.setInt(3, xpSign.getLocation().getBlockX());
+            ps.setInt(4, xpSign.getLocation().getBlockY());
+            ps.setInt(5, xpSign.getLocation().getBlockZ());
 
             return ps;
         }
