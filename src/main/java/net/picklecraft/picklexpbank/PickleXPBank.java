@@ -26,6 +26,9 @@ import net.picklecraft.Util.MySQLConnectionPool;
 import net.picklecraft.picklexpbank.Accounts.Account;
 import net.picklecraft.picklexpbank.Accounts.AccountManager;
 import net.picklecraft.picklexpbank.Listeners.XPSignListener;
+import net.picklecraft.picklexpbank.commands.AdminBankExecutor;
+import net.picklecraft.picklexpbank.commands.AdminSettingsExecutor;
+import net.picklecraft.picklexpbank.commands.PlayerBankExecutor;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -113,114 +116,31 @@ public class PickleXPBank extends JavaPlugin {
         XPSignListener listener = new XPSignListener(this);
         Bukkit.getPluginManager().registerEvents(listener, this);
         
+        AdminSettingsExecutor adminSettingsExecutor = new AdminSettingsExecutor();
+        getCommand("xpsettings").setExecutor(adminSettingsExecutor);
+        
+        AdminBankExecutor adminBankExecutor = new AdminBankExecutor();
+        getCommand("xpadd").setExecutor(adminBankExecutor);
+        getCommand("xpsub").setExecutor(adminBankExecutor);
+        getCommand("xpset").setExecutor(adminBankExecutor);
+        
+        PlayerBankExecutor playerBankExecutor = new PlayerBankExecutor();
+        getCommand("xppay").setExecutor(playerBankExecutor);
     }
     
     @Override 
     public void onDisable() {
         
     }
+    
     /*
     * TODO: make this easier to read!
     */
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        //player commands
-        /*if (sender instanceof Player) {
-
-            final Player senderPlayer = (Player)sender;
-            final Account senderAccount = accountManager.getAccount(senderPlayer.getUniqueId());
-            final Account receiverAccount = accountManager.getAccount(args[0]);
-            
-            if (receiverAccount == null) {
-                sender.sendMessage("Either too many matches for "+ args[0] +" or doesn't exist.");
-                return true;
-            }
-            
-            int amount = 0;
-            try {
-                amount = Integer.parseInt(args[1]);
-            }
-            catch (NumberFormatException ex) {
-                sender.sendMessage("The value must be an integer");
-                return true;
-            }
-            
-            
-            
-        }
-        //admin commands
-        else*/
-        if (args.length >= 2) {
-            return adminCommands(sender, command, label, args);
-        }
         return false;
     }
     
-    public boolean adminCommands(CommandSender sender, Command command, String label, String[] args) {
-        //first check for settings?
-        if (sender.hasPermission("PickleXPBank.admin.modifySettings")) {
-            if (command.getName().equalsIgnoreCase("xpsettings")) {
-                int amount = 0;
-                try {
-                    amount = Integer.parseInt(args[1]);
-                }
-                catch (NumberFormatException ex) {
-                    sender.sendMessage("The value must be an integer");
-                    return true;
-                }
-                    
-                if (args[1].equalsIgnoreCase("addRate")) {
-                    getConfig().set("settings.addRate", amount);
-                    return true;
-                }
-                
-                else if (args[1].equalsIgnoreCase("removeRate")) {
-                    getConfig().set("settings.removeRate", amount);
-                    return true;
-                }
-                
-                else if (args[1].equalsIgnoreCase("signLimit")) {
-                    getConfig().set("settings.signLimit", amount);
-                    return true;
-                }
-                return false;
-            }
-        }
-        
-        //alright, do player admin work!
-        final Player player = getPlayer(args[0]);
-        if (player == null) {
-            sender.sendMessage("Either too many matches for "+ args[0] +" or isn't online.");
-            return true;
-        }
-        int amount = 0;
-        try {
-            amount = Integer.parseInt(args[1]);
-        }
-        catch (NumberFormatException ex) {
-            sender.sendMessage("The value must be an integer");
-            return true;
-        }
-
-        final Account account = accountManager.getAccount(player.getUniqueId());      
-
-        if (command.getName().equalsIgnoreCase("xpadd")) {
-            account.addBalance(amount);
-            sender.sendMessage("Added "+ amount +" to "+ player.getName());
-            return true;
-        }
-        else if (command.getName().equalsIgnoreCase("xpsub")) {
-            account.subBalance(amount);
-            sender.sendMessage("Subtracted "+ amount +" from "+ player.getName());
-            return true;
-        }
-        else if (command.getName().equalsIgnoreCase("xpset")) {
-            account.setBalance(amount);
-            sender.sendMessage("Set "+ player.getName() +" to "+ amount);
-            return true;
-        }
-        return false;
-    }
     
     public Connection getConnection() {
         try {
