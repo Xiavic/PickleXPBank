@@ -19,6 +19,7 @@
 
 package net.picklecraft.picklexpbank.Accounts;
 
+import com.sun.org.apache.xml.internal.utils.Trie;
 import java.util.UUID;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import org.bukkit.entity.Player;
@@ -51,15 +52,44 @@ public class Account {
     }
     
     public void addBalance(long amount) {
-        final Player player = getPlayer();
         setBalance(balance + amount);
-        
-        player.setTotalExperience(player.getTotalExperience() - (int)amount);
     }
-    public void subBalance(long amount) {
+    
+    public boolean subBalance(long amount) {
+        long newBalance = balance - amount;
+        if (newBalance >= 0) {
+            setBalance(newBalance);
+            return true;
+        }
+        return false;
+    }
+    
+    /*
+    * @return boolean
+    */
+    public boolean subExperience(long amount) {
         final Player player = getPlayer();
-        setBalance(balance - amount);
-        player.setTotalExperience(player.getTotalExperience() + (int)amount);
+        if (player != null) {
+            int newXp = player.getTotalExperience() - (int)amount;
+            if (newXp >= 0) {
+                player.setTotalExperience(newXp);
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /*
+    * @return boolean
+    */
+    public boolean addExperience(long amount) {
+        final Player player = getPlayer();
+        if (player != null) {
+            player.setTotalExperience(player.getTotalExperience() + (int)amount);
+            return true;
+        }
+        return false;
     }
 
     public UUID getUuid() {
@@ -104,4 +134,5 @@ public class Account {
         
         return false;
     }
+ 
 }

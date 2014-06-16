@@ -26,10 +26,9 @@ import java.util.UUID;
 import net.picklecraft.picklexpbank.Factories.AccountFactory;
 import net.picklecraft.picklexpbank.PickleXPBank;
 import net.picklecraft.picklexpbank.XPSign;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-
 /**
  *
  * @author Pickle <curtisdhi@gmail.com>
@@ -74,6 +73,33 @@ public class AccountManager extends TimerTask {
         Account account = AccountFactory.createAccount(uuid);
         addAccount(account);
         return account;
+    }
+    
+    /*
+     * Will return a Account if a match was found,
+     * else it shall return null
+     *
+     * @return Account
+     */
+    public Account getAccount(String name) {
+        Account accountMatch = null;
+        name = name.toLowerCase();
+        int accountMatches = 0;
+        for (Account a : accounts) {
+            String name2 = a.getPlayerName().toLowerCase();
+            if (name2.contains(name)) {
+                accountMatch = a;
+                if (name2.equals(name)) {
+                    break;
+                } 
+                //If a second match is found, set playerMatch to null and break out
+                else if (++accountMatches > 1) {
+                    accountMatch = null;
+                    break;
+                }
+            }
+        }
+        return accountMatch;
     }
     
     public void addXPSign(XPSign xpSign) {

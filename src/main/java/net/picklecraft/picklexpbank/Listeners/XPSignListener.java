@@ -88,12 +88,14 @@ public class XPSignListener implements Listener {
                         if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
                             final long rate = plugin.getConfig().getLong("settings.removeRate");
                             xpSign.getAccount().subBalance(rate);
+                            xpSign.getAccount().addExperience(rate);
                             event.getPlayer().sendMessage("Subtracted "+ rate +" from your account");
                         }
                         //Right click adds to the sign and removes from the player
                         else if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                             final long rate = plugin.getConfig().getLong("settings.addRate");
                             xpSign.getAccount().addBalance(rate);
+                            xpSign.getAccount().subExperience(rate);
                             event.getPlayer().sendMessage("Added "+ rate +" to your account");
                         }
 

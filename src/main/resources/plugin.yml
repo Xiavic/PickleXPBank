@@ -4,6 +4,10 @@ author: [Pickle,ImHandMade]
 version: 0.1
 description: Allows players to store XP points, not levels, into signs.
 commands:
+    xpsettings:
+        permission: PickleXPBank.admin.modifySettings
+        description: changes a config setting
+        usage: /xpsettings [setting] [value]
     xpadd:
         permission: PickleXPBank.admin.modifyAccounts
         description: adds xp to player account
@@ -16,11 +20,19 @@ commands:
         permission: PickleXPBank.admin.modifyAccounts
         description: sets xp to player account
         usage: /xpset [player] [value]
+    xppay:
+        permission: PickleXPBank.transfer
+        description: Allows players to trade xp.
+        useage: /xppay [player] [value]
+        
 permissions:
      PickleXPBank.placeSign:
          description: Allows player to place a xp sign.
      PickleXPBank.createBank:
          description: Allows player to create a bank.
+     PickleXPBank.admin.modifySettings:
+         description: Allows admins to change settings
+         default: op
      PickleXPBank.admin.modifyAccounts:
          description: Allows admins to set, add, or subtract from accounts
          default: op
@@ -30,3 +42,6 @@ permissions:
      PickleXPBank.admin.destroy:
          description: Allows admin to destroy signs.
          default: op
+     PickleXPBank.transfer:
+         description: Allows player to transfer xp.
+         
